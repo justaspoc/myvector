@@ -15,13 +15,14 @@ class Vector
 private:
     int vsize, maxsize, maximum = 10000000;
     T *array;
-	inline void alloc_new() {
-        maxsize = vsize + 20;
-		T *tarr = new T[maxsize];
-		memcpy(tarr, array, vsize * sizeof(T));
-		delete [] array;
-		array = tarr;
-	}
+    inline void alloc_new()
+    {
+        maxsize = vsize * 2;
+        T *tarr = new T[maxsize];
+        memcpy(tarr, array, vsize * sizeof(T));
+        delete[] array;
+        array = tarr;
+    }
 
 public:
     typedef T value_type;
@@ -30,8 +31,12 @@ public:
     typedef ptrdiff_t difference_type;
     typedef value_type &reference;
     typedef value_type *pointer;
+    typedef T *iterator;
+    typedef const T *const_iterator;
     typedef const_value_type *const_pointer;
     typedef const_value_type &const_reference;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     pointer begin()
     {
@@ -42,7 +47,7 @@ public:
     pointer end()
     {
         pointer it;
-        it=&array[vsize - 1];
+        it = &array[vsize - 1];
         return it;
     };
     reference front()
@@ -51,7 +56,7 @@ public:
     };
     reference back()
     {
-        return (array[vsize-1]);
+        return (array[vsize - 1]);
     };
     Vector()
     {
@@ -163,98 +168,202 @@ public:
         delete[] array;
         array = tmp;
     };
-    void erase(pointer it) {
-		pointer iit = &array[it - array];
-		(*iit).~T();
-		memmove(iit, iit + 1, (vsize - (it - array) - 1) * sizeof(T));
-		--vsize;
-	}
-	void erase(pointer first, pointer last) {
-        value_type* temp= first;
-		pointer f = &array[first - array];
-		for ( ; first != last; ++first)
-			(*first).~T();
-		memmove(f, last, (vsize - (last - array)) * sizeof(T));
-		vsize -= last - temp;
-	}
-    
-    
-	pointer insert(pointer it, const T &val) {
-		pointer iit = &array[it - array];
-		if (vsize == max_size) {
-			max_size <<= 2;
-			alloc_new();
-		}
-		memmove(iit + 1, iit, (vsize - (it - array)) * sizeof(T));
-		(*iit) = val;
-		++vsize;
-		return iit;
-	}
+    void erase(pointer it)
+    {
+        pointer iit = &array[it - array];
+        (*iit).~T();
+        memmove(iit, iit + 1, (vsize - (it - array) - 1) * sizeof(T));
+        --vsize;
+    }
+    void erase(pointer first, pointer last)
+    {
+        value_type *temp = first;
+        pointer f = &array[first - array];
+        for (; first != last; ++first)
+            (*first).~T();
+        memmove(f, last, (vsize - (last - array)) * sizeof(T));
+        vsize -= last - temp;
+    }
 
-	
-	pointer insert(pointer it, T &&val) {
-		pointer iit = &array[it - array];
-		if (vsize == max_size) {
-			max_size <<= 2;
-			alloc_new();
-		}
-		memmove(iit + 1, iit, (vsize - (it - array)) * sizeof(T));
-		(*iit) = std::move(val);
-		++vsize;
-		return iit;
-	}
+    pointer insert(pointer it, const T &val)
+    {
+        pointer iit = &array[it - array];
+        if (vsize == max_size)
+        {
+            max_size <<= 2;
+            alloc_new();
+        }
+        memmove(iit + 1, iit, (vsize - (it - array)) * sizeof(T));
+        (*iit) = val;
+        ++vsize;
+        return iit;
+    }
 
-	void reserve(int sz) {
+    pointer insert(pointer it, T &&val)
+    {
+        pointer iit = &array[it - array];
+        if (vsize == maxsize)
+        {
+            maxsize <<= 2;
+            alloc_new();
+        }
+        memmove(iit + 1, iit, (vsize - (it - array)) * sizeof(T));
+        (*iit) = std::move(val);
+        ++vsize;
+        return iit;
+    }
+    void reserve(int sz) {
 		if (sz > maxsize) {
 			maxsize = sz;
 			alloc_new();
 		}
 	}
+    void resize(int sz)
+    {
+        if (sz > vsize)
+        {
+            if (sz > maxsize)
+            {
+                maxsize = sz;
+                alloc_new();
+            }
+        }
+        else
+        {
+            size_type i;
+            for (i = vsize; i < sz; ++i)
+                array[i].~T();
+        }
+        vsize = sz;
+    }
 
-	void resize(int sz) {
-		if (sz > vsize) {
-			if (sz > maxsize) {
-				maxsize = sz;
-				alloc_new();
-			}
-		} else {
-			size_type i;
-			for (i = vsize; i < sz; ++i)
-				array[i].~T();
-		}
-		vsize = sz;
+    void resize(int sz, const T &c)
+    {
+        if (sz > vsize)
+        {
+            if (sz > maxsize)
+            {
+                maxsize = sz;
+                alloc_new();
+            }
+            size_type i;
+            for (i = vsize; i < sz; ++i)
+                array[i] = c;
+        }
+        else
+        {
+            size_type i;
+            for (i = vsize; i < sz; ++i)
+                array[i].~T();
+        }
+        vsize = sz;
+    }
+
+    void swap(Vector<T> &other)
+    {
+        size_t tvsize = vsize,
+               tmaxsize = maxsize;
+        T *tarray = array;
+
+        vsize = other.vsize;
+        maxsize = other.maxsize;
+        array = other.array;
+
+        other.vsize = tvsize;
+        other.maxsize = tmaxsize;
+        other.array = tarray;
+    }
+
+    bool operator==(const Vector<value_type> &vec) const
+    {
+        if (vsize != vec.vsize)
+            return false;
+        size_type i;
+        for (i = 0; i < vsize; ++i)
+            if (array[i] != vec.array[i])
+                return false;
+        return true;
+    }
+
+    bool operator!=(const Vector<value_type> &vec) const
+    {
+        if (vsize != vec.vsize)
+            return true;
+        size_type i;
+        for (i = 0; i < vsize; ++i)
+            if (array[i] != vec.array[i])
+                return true;
+        return false;
+    }
+
+    bool operator<(const Vector<value_type> &vec) const
+    {
+        size_type i, j, ub = vsize < vec.vsize ? vsize : vec.vsize;
+        for (i = 0; i < ub; ++i)
+            if (array[i] != vec.array[i])
+                return array[i] < vec.array[i];
+        return vsize < vec.vsize;
+    }
+
+    bool operator<=(const Vector<value_type> &vec) const
+    {
+        size_type i, j, ub = vsize < vec.vsize ? vsize : vec.vsize;
+        for (i = 0; i < ub; ++i)
+            if (array[i] != vec.array[i])
+                return array[i] < vec.array[i];
+        return vsize <= vec.vsize;
+    }
+
+    bool operator>(const Vector<value_type> &vec) const
+    {
+        size_type i, j, ub = vsize < vec.vsize ? vsize : vec.vsize;
+        for (i = 0; i < ub; ++i)
+            if (array[i] != vec.array[i])
+                return array[i] > vec.array[i];
+        return vsize > vec.vsize;
+    }
+
+    bool operator>=(const Vector<value_type> &vec) const
+    {
+        size_type i, j, ub = vsize < vec.vsize ? vsize : vec.vsize;
+        for (i = 0; i < ub; ++i)
+            if (array[i] != vec.array[i])
+                return array[i] > vec.array[i];
+        return vsize >= vec.vsize;
+    }
+
+    const_iterator cbegin() const
+    {
+        return array;
+    }
+
+    const_iterator cend() const
+    {
+        return array + vsize;
+    }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(array + vsize);
+    }
+
+    const_reverse_iterator crbegin() const
+    {
+        return reverse_iterator(array + vsize);
+    }
+
+    reverse_iterator rend()
+    {
+        return reverse_iterator(array);
+    }
+
+    const_reverse_iterator crend() const
+    {
+        return reverse_iterator(array);
+    }
+
+	value_type * data() noexcept {
+		return array;
 	}
-
-	void resize(int sz, const T &c) {
-		if (sz > vsize) {
-			if (sz > maxsize) {
-				maxsize = sz;
-				alloc_new();
-			}
-			size_type i;
-			for (i = vsize; i < sz; ++i)
-				array[i] = c;
-		} else {
-			size_type i;
-			for (i = vsize; i < sz; ++i)
-				array[i].~T();
-		}
-		vsize = sz;
-	}
-
-	void swap(Vector<T> &other) {
-		size_t tvsize = vsize,
-			   tmaxsize = maxsize;
-		T *tarray = array;
-
-		vsize = other.vsize;
-		maxsize = other.maxsize;
-		array = other.array;
-
-		other.vsize = tvsize;
-		other.maxsize = tmaxsize;
-		other.array = tarray;
-	}
-    
 };
 #endif
