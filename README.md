@@ -66,7 +66,7 @@ pointer insert(pointer it, const T &val)
 4
 5
 
-vec.insert(vec.begin()+2, 2000);
+//vec.insert(vec.begin()+2, 2000);
 
 1
 2
@@ -88,6 +88,26 @@ void assign(int a, value_type b)
         }
     }
 ```
+```shell
+1
+2
+3
+4
+5
+
+//vec.assign(5,10);
+
+1
+2
+3
+4
+5
+10
+10
+10
+10
+10
+```
 ### Pop_back
 ```c++
 void pop_back()
@@ -99,5 +119,19 @@ void pop_back()
         delete[] array;
         array = tmp;
     };
+ ```
+ ```shell
+1
+2
+3
+4
+5
+
+//vec.pop_back();
+
+1
+2
+3
+4
  ```
 
