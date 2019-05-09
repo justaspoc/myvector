@@ -141,3 +141,10 @@ void pop_back()
 | Vector   	| 1     	| 2      	| 17      	| 201      	| 2230      	|
 | Myvector 	| 1      	| 1       	| 9        	| 116         	| 1111          	|
 
+## Atminties perskirstymai
+
+|               	| Vector 	| Myvector 	|
+|---------------	|--------	|----------	|
+| Perskirstymai 	| 28     	| 23       	|
+
+
