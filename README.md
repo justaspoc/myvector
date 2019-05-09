@@ -75,25 +75,17 @@ vec.insert(vec.begin()+2, 2000);
 4
 5
 ```
-### Resize
+### Assign
 ```c++
-void resize(int sz)
+void assign(int a, value_type b)
     {
-        if (sz > vsize)
+        for (size_t i = 1; i <= a; i++)
         {
-            if (sz > maxsize)
-            {
-                maxsize = sz;
+            if (vsize + 1 > maxsize)
                 alloc_new();
-            }
+            array[vsize] = b;
+            vsize++;
         }
-        else
-        {
-            size_type i;
-            for (i = vsize; i < sz; ++i)
-                array[i].~T();
-        }
-        vsize = sz;
     }
 ```
 ### Pop_back
