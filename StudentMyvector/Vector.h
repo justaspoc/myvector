@@ -24,7 +24,10 @@ private:
     {
         maxsize = vsize * 2;
         T *tarr = new T[maxsize];
-        memcpy(tarr, array, vsize * sizeof(T));
+        for (size_t i = 0; i < vsize; i++)
+        {
+            tarr[i] = array[i];
+        }
         delete[] array;
         array = tarr;
     }
@@ -87,7 +90,7 @@ public:
     };
     ~Vector()
     {
-        //delete[] array;
+        delete[] array;
     };
 
     int size() { return vsize; };
@@ -99,32 +102,19 @@ public:
             return array[i];
         throw std::out_of_range("out of range");
     };
-	
+
     Vector<value_type> &operator=(const Vector &v)
     {
-		/*
-        if (this != &v)
+        size_type i;
+        if (maxsize < v.vsize)
         {
-            maxsize = v.maxsize;
-            vsize = v.vsize;
-            delete[] array;
-            array = new value_type[maxsize];
-            for (size_t i = 0; i < v.vsize; i++)
-            {
-                array[i] = v.array[i];
-            }
+            maxsize = v.vsize << 2;
+            alloc_new();
         }
+        for (i = 0; i < v.vsize; ++i)
+            array[i] = v.array[i];
+        vsize = v.vsize;
         return *this;
-		*/
-		size_type i;
-		if (maxsize < v.vsize) {
-			maxsize = v.vsize << 2;
-			alloc_new();
-		}
-		for (i = 0; i < v.vsize; ++i)
-			array[i] = v.array[i];
-		vsize = v.vsize;
-		return *this;
     }
     Vector &operator+=(value_type i)
     {
@@ -229,12 +219,14 @@ public:
         ++vsize;
         return iit;
     }
-    void reserve(int sz) {
-		if (sz > maxsize) {
-			maxsize = sz;
-			alloc_new();
-		}
-	}
+    void reserve(int sz)
+    {
+        if (sz > maxsize)
+        {
+            maxsize = sz;
+            alloc_new();
+        }
+    }
     void resize(int sz)
     {
         if (sz > vsize)
@@ -379,8 +371,9 @@ public:
         return reverse_iterator(array);
     }
 
-	value_type * data() noexcept {
-		return array;
-	}
+    value_type *data() noexcept
+    {
+        return array;
+    }
 };
 #endif
