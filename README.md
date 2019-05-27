@@ -141,6 +141,13 @@ void pop_back()
 | Vector   	| 1     	| 2      	| 17      	| 201      	| 2230      	|
 | Myvector 	| 1      	| 1       	| 12        	| 134         	| 1304          	|
 
+Class student
+
+|          | 10  | 100 | 1000 | 10000 | 100000 |
+|----------|-----|-----|------|-------|--------|
+| Vector   | 166 | 312 | 1968 | 19954 | 181000 |
+| MyVector | 162 | 470 | 3080 | 31312 | 341671 |
+
 ## Atminties perskirstymai
 
 |               	| Vector 	| Myvector 	|
