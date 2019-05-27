@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "student.h"
 #include "Vector.h"
 #include <algorithm>
